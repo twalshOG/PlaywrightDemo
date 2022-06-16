@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('https://demo.playwright.dev/todomvc');
@@ -11,6 +12,91 @@ const TODO_ITEMS = [
 ];
 
 test.describe('New Todo', () => {
+
+  test('should allow me to add todo items', async ({ page }) => {
+    // Create 1st todo.
+    await page.locator('.new-todo').fill(TODO_ITEMS[0]);
+    await page.locator('.new-todo').press('Enter');
+
+    // Make sure the list only has one todo item.
+    await expect(page.locator('.view label')).toHaveText([
+      TODO_ITEMS[0]
+    ]);
+
+    // Create 2nd todo.
+    await page.locator('.new-todo').fill(TODO_ITEMS[1]);
+    await page.locator('.new-todo').press('Enter');
+
+    // Make sure the list now has two todo items.
+    await expect(page.locator('.view label')).toHaveText([
+      TODO_ITEMS[0],
+      TODO_ITEMS[1]
+    ]);
+  });
+
+  test('should allow chained finds with different selector types', async ({ page }) => {
+    // Create 3 items.
+    await createDefaultTodos(page);
+
+    // Chained locators, using CSS and XPath
+    await expect(page.locator('.view').locator("//label")).toHaveText(TODO_ITEMS);
+  });
+
+  test('should allow stacked element', async ({ page }) => {
+    await createDefaultTodos(page);
+
+    // Stacking elements
+    const todoItems = page.locator('.todo-list li');
+    const secondTodo = todoItems.nth(1);
+
+    await secondTodo.dblclick();
+    await expect(secondTodo.locator('.edit')).toHaveValue(TODO_ITEMS[1]);
+    await secondTodo.locator('.edit').fill('buy some sausages');
+    await secondTodo.locator('.edit').press('Enter');
+
+    // Explicitly assert the new text value.
+    await expect(todoItems).toHaveText([
+      TODO_ITEMS[0],
+      'buy some sausages',
+      TODO_ITEMS[2]
+    ]);
+    await checkTodosInLocalStorage(page, 'buy some sausages');
+  });
+
+  test('should match screenshot - will fail', async ({ page }) => {
+    // Create one todo item.
+    await page.locator('.new-todo').fill(TODO_ITEMS[0]);
+    await page.locator('.new-todo').press('Enter');
+
+    // Screenshot match
+    expect(await page.screenshot()).toMatchSnapshot('landing.png', { threshold: 0.3 });
+
+    // If we were just matching an element
+    ////expect(await page.locator('.filters >> text=Active').screenshot()).toMatchSnapshot('landing.png', { threshold: 0.3 });
+  });
+
+      // Test with accessibility check
+  test('should pass accessibility check - will fail', async ({ page }) => {
+    // Create one todo item.
+    await page.locator('.new-todo').fill(TODO_ITEMS[0]);
+    await page.locator('.new-todo').press('Enter');
+
+    // Run accessablity check
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations.length, JSON.stringify(results)).toBe(0)
+  });
+
+  // Bad selector
+  test('should find - will fail', async ({ page }) => {
+    // Create one todo item.
+    await page.locator('.new-todo-BAD').fill(TODO_ITEMS[0]);
+  });
+
+  
+
+
+
+
   test('should allow me to add todo items', async ({ page }) => {
     // Create 1st todo.
     await page.locator('.new-todo').fill(TODO_ITEMS[0]);

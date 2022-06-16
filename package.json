@@ -16,6 +16,10 @@
   },
   "homepage": "https://github.com/twalshOG/PlaywrightDemo#readme",
   "devDependencies": {
-    "@playwright/test": "^1.22.2"
+    "@playwright/test": "^1.22.2",
+    "axe-core": "^4.4.2"
+  },
+  "dependencies": {
+    "@axe-core/playwright": "^4.4.3"
   }
 }
