@@ -69,7 +69,7 @@ test.describe('New Todo', () => {
     await page.locator('.new-todo').press('Enter');
 
     // Screenshot match
-    expect(await page.screenshot()).toMatchSnapshot('landing.png', { threshold: 0.3 });
+    expect(await page.screenshot()).toMatchSnapshot('landing.png', { threshold: 0.5 });
 
     // If we were just matching an element
     ////expect(await page.locator('.filters >> text=Active').screenshot()).toMatchSnapshot('landing.png', { threshold: 0.3 });
@@ -83,7 +83,7 @@ test.describe('New Todo', () => {
 
     // Run accessablity check
     const results = await new AxeBuilder({ page }).analyze();
-    expect(results.violations.length, JSON.stringify(results)).toBe(0)
+    expect(results.violations.length, JSON.stringify(results.violations, null, 2)).toBe(0)
   });
 
   // Bad selector
