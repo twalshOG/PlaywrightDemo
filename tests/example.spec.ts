@@ -13,6 +13,10 @@ const TODO_ITEMS = [
 
 test.describe('New Todo', () => {
 
+  test('flaky test', async () => {
+    expect(Math.floor(Math.random() * 10)).toBeLessThanOrEqual(6);
+  });
+
   test('should allow me to add todo items', async ({ page }) => {
     // Create 1st todo.
     await page.locator('.new-todo').fill(TODO_ITEMS[0]);
@@ -63,13 +67,17 @@ test.describe('New Todo', () => {
     await checkTodosInLocalStorage(page, 'buy some sausages');
   });
 
-  test('should match screenshot - will fail', async ({ page }) => {
+  test('should match screenshot - will fail', async ({ page, browserName }) => {
+
+    // Note that the chromium image does not match at all
+    test.fail(browserName === 'chromium');
+
     // Create one todo item.
     await page.locator('.new-todo').fill(TODO_ITEMS[0]);
     await page.locator('.new-todo').press('Enter');
 
     // Screenshot match
-    expect(await page.screenshot()).toMatchSnapshot('landing.png', { threshold: 0.5 });
+    expect(await page.screenshot()).toMatchSnapshot('landing.png', { threshold: 0.7 });
 
     // If we were just matching an element
     ////expect(await page.locator('.filters >> text=Active').screenshot()).toMatchSnapshot('landing.png', { threshold: 0.3 });
@@ -87,7 +95,17 @@ test.describe('New Todo', () => {
   });
 
   // Bad selector
-  test('should find - will fail', async ({ page }) => {
+  test('should find - with expected fail', async ({ page }) => {
+
+    // We expect this test to fail
+    test.fail();
+
+    await expect(page.locator('.new-todo-BAD')).toHaveText('Sign in', { timeout: 1000 });
+  });
+
+  // Bad selector
+  test('should fill - will timeout/fail', async ({ page }) => {
+
     // Create one todo item.
     await page.locator('.new-todo-BAD').fill(TODO_ITEMS[0]);
   });
