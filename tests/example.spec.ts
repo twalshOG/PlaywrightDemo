@@ -14,7 +14,7 @@ const TODO_ITEMS = [
 test.describe('New Todo', () => {
 
   test('flaky test', async () => {
-    expect(Math.floor(Math.random() * 10)).toBeLessThanOrEqual(6);
+    expect(Math.floor(Math.random() * 10)).toBeLessThanOrEqual(4);
   });
 
   test('should allow me to add todo items', async ({ page }) => {
