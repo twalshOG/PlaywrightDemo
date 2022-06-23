@@ -17,6 +17,27 @@ test.describe('New Todo', () => {
     expect(Math.floor(Math.random() * 10)).toBeLessThanOrEqual(4);
   });
 
+
+  test('should interact with two tabs - will fail', async ({ page }) => {
+
+    // Create 1st todo.
+    await page.locator('.new-todo').fill(TODO_ITEMS[0]);
+    await page.locator('.new-todo').press('Enter');
+
+    var newPage = await page.context().newPage();
+    await newPage.goto('https://demo.playwright.dev/todomvc');
+
+    // Make sure the list only has one todo item.
+    await expect(page.locator('.view label')).toHaveText([
+      TODO_ITEMS[0]
+    ]);
+
+    // Will fail here
+    await expect(newPage.locator('.view label BAD')).toHaveText([
+      TODO_ITEMS[0]
+    ]);
+  });
+
   test('should allow me to add todo items', async ({ page }) => {
     // Create 1st todo.
     await page.locator('.new-todo').fill(TODO_ITEMS[0]);
